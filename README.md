@@ -29,7 +29,8 @@ v8.16.0
   - [Getting Started](#getting-started)
   - [Installation](#installation)
   - [Usage](#usage)
-    - [Serving the app](#serving-the-app)
+    - [Factory flavor](#factory-flavor)
+    - [Class Flavor](#class-flavor)
     - [Running the tests](#running-the-tests)
     - [Building a distribution version](#building-a-distribution-version)
     - [Serving the distribution version](#serving-the-distribution-version)
@@ -67,10 +68,10 @@ $ npm install deferable
 
 ## Usage
 
-### `Defer` - factory flavor
-This is a simple factory method
+### Factory flavor
+**Defer**: This is a simple factory method
 
-#### Inside your project
+Inside your project:
 
 ```js
 import {
@@ -78,7 +79,7 @@ import {
 } from 'deferable'
 
 const { result, ...lever } = Defer(function() {
-    // returning the actual operation which returns promise
+    // returning the actual operation which returns promise e.g.
     return http.call(url)
     }, "result")
 
@@ -96,17 +97,18 @@ It returns an object with three keys: `promise, trigger, called`;
     - trigger is a function which triggers the promise fulfillment.
     - called is a flag
 
-###  `Deferred` `DeferredWorkload` - class flavor
+### Class flavor
+**Deferred, DeferredTrigger**
 In essence the class implementation of the above
 
-Objects `Deferred` and `DeferredWorkload` is typeof **Promise** should your project require this feature.
+Objects `Deferred` and `DeferredTrigger` is typeof **Promise** should your project require this feature.
 
 #### Inside your project
 
 ```js
 import {
     Deferred,
-    DeferredWorkload,
+    DeferredTrigger,
 } from 'deferable'
 
 ```

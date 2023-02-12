@@ -34,7 +34,7 @@ export class DeferredPromise extends Promise {
  *
  * @param {Function} takes as argument factory returning promise
  */
-export class DefferedWorkload extends DeferredPromise {
+export class DefferedTrigger extends DeferredPromise {
 	constructor(workload) {
 		super();
 		this._workload = workload
