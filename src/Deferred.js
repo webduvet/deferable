@@ -37,11 +37,10 @@ export class DeferredPromise extends Promise {
 export class DefferedWorkload extends DeferredPromise {
 	constructor(workload) {
 		super();
-
 		this._workload = workload
 	}
 
-	executor() {
+	trigger() {
 		return this._workload()
 			.then((data) => {
 				this.resolve(data)

@@ -67,19 +67,49 @@ $ npm install deferable
 
 ## Usage
 
-### Inside your project
+### `Defer` - factory flavor
+This is a simple factory method
+
+#### Inside your project
 
 ```js
 import {
     Defer
 } from 'deferable'
 
-const deferred = Defer(function() {
+const { result, ...lever } = Defer(function() {
     // returning the actual operation which returns promise
     return http.call(url)
-})
+    }, "result")
+
+
+// passing a promise to where is it expected
+consumerService(result)
+...
+// at some point in the code this triggers the promise fulfillment
+lever.trigger()
 ```
 
+It returns an object with three keys: `promise, trigger, called`;
+
+    - first contains the actual promise which can be consumed.
+    - trigger is a function which triggers the promise fulfillment.
+    - called is a flag
+
+###  `Deferred` `DeferredWorkload` - class flavor
+In essence the class implementation of the above
+
+Objects `Deferred` and `DeferredWorkload` is typeof **Promise** should your project require this feature.
+
+#### Inside your project
+
+```js
+import {
+    Deferred,
+    DeferredWorkload,
+} from 'deferable'
+
+```
 
 ### Running the tests
 
