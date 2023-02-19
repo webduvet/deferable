@@ -4,7 +4,7 @@
   "description": "for creating deferred Promise and actionable promise",
   "main": "index.js",
   "scripts": {
-    "test": "mocha ./**/*.test.js",
+    "test": "mocha ./lib/**/*.test.js",
     "build": "babel src -d lib --source-maps"
   },
   "keywords": [
@@ -20,7 +20,6 @@
     "@babel/core": "^7.20.12",
     "@babel/preset-env": "^7.20.2",
     "chai": "^4.3.7",
-    "mocha": "^10.2.0",
-    "sinon": "^15.0.1"
+    "mocha": "^10.2.0"
   }
 }

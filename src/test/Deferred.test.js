@@ -1,19 +1,11 @@
-//import {
-	//assert,
-	//describe,
-//} from 'sinon';
-//
+import {
+    Defer,
+    Deferred,
+} from '../src/Deferred.js'
 
-//import sinon from 'sinon'
-
-//const sinon = require('sinon')
-
-//import {
-	//Defer,
-	//Deferred,
-//} from './src/Deferred.js'
-
-//import fakeCall from './fakeCall.js'
+import {
+    fakeCall
+} from '../src/utils.js'
 
 import {
 	assert 
@@ -47,7 +39,10 @@ describe('Defer', function() {
 
 	it('should start promise resolution when called trigger()', function(done) {
 		const deferred = Defer(() => new Promise(
-			(res) => { setTimeout(fucntion() {res('resolved')}) }));
+            (res) => {
+                setTimeout(() => { res('resolved') }, 0)
+                //setTimeout(fucntion(){res('resolved')}, 0)
+            }));
 
 		assert.false(deferred.called);
 
