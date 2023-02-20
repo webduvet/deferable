@@ -1,25 +1,30 @@
 {
   "name": "deferable",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "for creating deferred Promise and actionable promise",
   "main": "index.js",
   "scripts": {
-    "test": "mocha ./lib/**/*.test.js",
+    "test": "npm run build && mocha --require @babel/register ./lib/**/*.test.js",
     "build": "babel src -d lib --source-maps"
   },
   "keywords": [
     "promise",
+	"deferred",
     "defer",
-    "load-balancer",
     "throttle"
   ],
   "author": "Andrej Bartko",
   "license": "ISC",
   "devDependencies": {
     "@babel/cli": "^7.20.7",
-    "@babel/core": "^7.20.12",
+    "@babel/core": "^7.21.0",
+    "@babel/plugin-transform-runtime": "^7.21.0",
     "@babel/preset-env": "^7.20.2",
+    "@babel/register": "^7.21.0",
     "chai": "^4.3.7",
     "mocha": "^10.2.0"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.21.0"
   }
 }

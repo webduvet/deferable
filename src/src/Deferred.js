@@ -10,7 +10,7 @@
  * @param? {Function} resolver function taking two params: function resolve and function reject
  * 		this parameter is provided as default
  */
-class DeferredPromise extends Promise {
+export class DeferredPromise extends Promise {
 	constructor(resolver) {
 		const that = {};
 		super(function(resolve, reject) {
@@ -35,7 +35,7 @@ class DeferredPromise extends Promise {
  *
  * @param {Function} takes as argument factory returning promise
  */
-class DeferredTrigger extends DeferredPromise {
+export class DeferredTrigger extends DeferredPromise {
 	constructor(load) {
 		if (load.length == 2) {
 			super(load);

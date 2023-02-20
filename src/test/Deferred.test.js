@@ -89,7 +89,17 @@ describe('deferable', function() {
     })
 
     describe('DeferredTrigger', function() {
-        it('DeferredTrigger is Promise', function(done) {
+        it('DeferredTrigger is Promise', function() {
+            const executorFn = () => new Promise(
+                (res) => {
+                    setTimeout(function(){res('resolved')}, 0)
+                })
+            const _p = new DeferredTrigger(executorFn)
+
+            assert.instanceOf(_p, Promise)
+        });
+
+		it('DeferredTrigger can be triggered via trigger method', function(done) {
             const executorFn = () => new Promise(
                 (res) => {
                     setTimeout(function(){res('resolved')}, 0)
@@ -100,10 +110,7 @@ describe('deferable', function() {
                 assert.equal(value, 'resolved');
                 done()
             })
-            assert.instanceOf(_p, Promise)
-            debugger;
             _p.trigger()
-
-        })
+		});
     })
 })

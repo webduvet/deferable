@@ -113,6 +113,7 @@ deferred.trigger()
 
 **Deferred** class is just a plain implementation of the deferred pattern exposing `resolve` and `reject` resolvers.
 
+
 ```js
 import {
     Deffered
