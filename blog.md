@@ -1,5 +1,4 @@
 # Deferred pattern
-
 As the name suggest it defers the execution of a code to a later stage. It is used in conjuction with Promise and sometimes it gets confused for Promise. Although both are similar there are some substantial differences.
 
 There is a lot of different implementation of Deferred pattern also there is many implementation of Promise pattern. For the sake of simplicity I will focuse on Javascript and on current JS specification regarding Primise.
@@ -17,7 +16,6 @@ In this case we need to *Defer* the promise fullfilment to later stage when the 
 
 
 ## Deferred as subclass of Promise
-
 This implementation extends the existing Promise class. This is handly for cases when the `instanceof` Promise is expected.
 The disadvantage if this approach is quiet tricky implementation. The Prmise object needs to be *thenable* and as per specification it need to return the Promise object instantiated from the same class as the calling object. This means internally the constructor is called with standard resolver method which we need to support. Hence the check for the resolver argument. Seconday we are robbing ourselves from any potential native performance optimisation regarding `Promise` class or it's instance.
 ```javascript
