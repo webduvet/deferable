@@ -10,7 +10,7 @@
  * @param? {Function} resolver function taking two params: function resolve and function reject
  * 		this parameter is provided as default
  */
-export class DeferredPromise extends Promise {
+export class Deferred extends Promise {
 	constructor(resolver=function(resolve, reject) {}) {
 		const that = {};
 		super(function(resolve, reject) {
@@ -20,7 +20,6 @@ export class DeferredPromise extends Promise {
 		resolver(this.resolve, this.reject)
 	}
 }
-
 
 /**
  * @desc
@@ -34,10 +33,11 @@ export class DeferredPromise extends Promise {
  *
  * @param {Function} takes as argument factory returning promise
  */
-export class DefferedTrigger extends DeferredPromise {
-	constructor(workload) {
-		super();
+export class DeferredTrigger extends DeferredPromise {
+	constructor(workload, resolver=function(resolve, reject) {}) {
+		super(function(resolve, reject) {});
 		this._workload = workload
+        console.log(this)
 	}
 
 	trigger() {
@@ -51,6 +51,47 @@ export class DefferedTrigger extends DeferredPromise {
 	}
 }
 
+// only this makes sense
+// Promise or it's subclass can't be insantiated without resolver in constructor actually present
+// this makes any subclassing very limiting.
+// passing the workload (promise factory via deposit method)
+// adding few extra handy APIs to interract with the object
+class Bond extends Promise {
+	constructor(resolver=function(resolve, reject) {}) {
+		const that = {};
+		super(function(resolve, reject) {
+			Object.assign(that, {resolve, reject})
+		});
+		Object.assign(this, that)
+		resolver(this.resolve, this.reject)
+        this._settled = false;
+	}
+    deposit(workload) {
+        this._workload = workload
+    }
+    get settled() {
+        return this._settled;
+    }
+	trigger() {
+        if (!this._workload) {
+            throw Error('No workload in deposit')
+        }
+	    this._workload()
+			.then((data) => {
+                debugger;
+				this.resolve(data)
+			})
+			.catch(reason => {
+				this.reject(reason)
+			})
+            .finally(() => {
+                this._settled = true;
+            })
+	}
+}
+
+function Bond(promiseFactory) {
+}
 
 /**
  * @desc
@@ -74,7 +115,6 @@ export function Defer(workload) {
 			_called = true;
 			if (_executor) {
 				return _executor;
-				console.log('returning original')
 			}
 			return _executor = workload()
 				.then(data => {
@@ -93,7 +133,7 @@ export function Defer(workload) {
 			return _called ? true : false;
 		},
 
-		execute(callback=function() {}) {
+	    trigger(callback=function() {}) {
 			executor().finally(callback)
 		}
 	}

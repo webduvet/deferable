@@ -1,6 +1,7 @@
 import {
     Defer,
-    Deferred,
+    DeferredPromise,
+    DeferredTrigger,
 } from '../src/Deferred.js'
 
 import {
@@ -11,51 +12,98 @@ import {
 	assert 
 } from 'chai'
 
-describe('Defer', function() {
-	it('Should return executor function', function() {
-		const p = Defer(() => fakeCall());
+describe('deferable', function() {
+    describe('Defer', function() {
+        it('Should return object containing promise and trigger function', function() {
+            const p = Defer(() => fakeCall());
 
-		assert.equal(typeof p, 'function');
-		assert.true(p instanceof Promise);
-	});
+            assert.equal(typeof p, 'object');
+            assert.property(p, 'promise');
+            assert.property(p, 'called');
+            assert.property(p, 'trigger');
+        });
 
-	it('executor function should return Promise instance and trigger', function() {
-		const p = Defer(() => fakeCall());
+        it('calling trigger should set called flag to true', function() {
+            const deferred = Defer(() => new Promise((res) => { res('resolved') }));
 
-		const { promise, trigger, called } = p();
+            assert.isFalse(deferred.called);
+            deferred.trigger();
+            assert.isTrue(deferred.called);
+        })
 
-		assert.true(promise instanceof Promise);
-		assert.true(typeof trigger === 'function');
-		assert.true(typeof called === 'boolean');
-	});
+        it('should start promise resolution when called trigger()', function(done) {
+            const executorFn = () => new Promise(
+                (res) => {
+                    setTimeout(function(){res('resolved')}, 0)
+                })
+            const deferred = Defer(executorFn);
 
-	it('calling trigger should set called flag to true', function() {
-		const deferred = Defer(() => new Promise((res) => { res('resolved') }));
+            assert.isFalse(deferred.called);
 
-		assert.false(deferred.called);
-		deferred.trigger();
-		assert.true(deferred.called);
-	})
+            deferred.trigger();
 
-	it('should start promise resolution when called trigger()', function(done) {
-		const deferred = Defer(() => new Promise(
-            (res) => {
-                setTimeout(() => { res('resolved') }, 0)
-                //setTimeout(fucntion(){res('resolved')}, 0)
-            }));
+            deferred.promise
+                .then(value => {
+                    assert.equal(value, 'resolved')
+                    done();
+                })
+                .catch(() => {
+                    assert.fail()
+                })
 
-		assert.false(deferred.called);
+        })
+    });
 
-		deferred.trigger();
+    describe('Deferred Promise', function() {
+        it('DeferredPromise should be instance of Promise', function() {
+            const _p = new DeferredPromise(function() {})
+            assert.instanceOf(_p, Promise)
+        })
 
-		deferred.promise
-			.then(value => {
-				assert.equal(value, 'resolved')
-				done();
-			})
-			.catch(() => {
-				assert.true(false)
-			})
+        it('DeferredPromise should expose resolve and reject handles', function() {
+            const _p = new DeferredPromise(function() {})
 
-	})
+            assert.property(_p, 'resolve')
+            assert.property(_p, 'reject')
+        })
+
+        it('DeferredPromise should resolve with resolve handle', function(done) {
+            const _p = new DeferredPromise(function() {})
+
+            _p.resolve('resolved')
+
+            _p.then(value => {
+                assert.equal(value, 'resolved')
+            }).finally(done) 
+        })
+
+        it('DeferredPromise should reject with reject handle', function() {
+            const _p = new DeferredPromise(function() {})
+
+            _p.reject('rejected')
+
+            _p.catch(reason => {
+                assert.equal(reson, 'rejected')
+            }) 
+        })
+    })
+
+    describe('DeferredTrigger', function() {
+        it('DeferredTrigger is Promise', function(done) {
+            const executorFn = () => new Promise(
+                (res) => {
+                    setTimeout(function(){res('resolved')}, 0)
+                })
+            const _p = new DeferredTrigger(executorFn)
+
+            _p.then(value => {
+                assert.equal(value, 'resolved');
+                done()
+            })
+            assert.instanceOf(_p, Promise)
+            debugger;
+            _p.trigger()
+
+        })
+    })
 })
