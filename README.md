@@ -63,8 +63,9 @@ $ npm install deferable
 
 ## Usage
 
-### Factory flavor
-**Defer**: This is a simple factory method
+Factory Flavor: **Defer**
+
+This is a simple factory method
 
 Inside your project:
 
@@ -92,8 +93,9 @@ It returns an object with three keys: `promise, trigger, called`;
     - trigger is a function which triggers the promise fulfillment.
     - called is a flag
 
-### Class flavor
-**Deferred, DeferredTrigger**
+
+Class flavor: **Deferred, DeferredTrigger**
+
 In essence the class implementation of the above.
 Objects `Deferred` and `DeferredTrigger` is typeof **Promise** should your project require this feature.
 
@@ -160,13 +162,6 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 ## Credits
 
 TODO: Write credits
-
-## Built With
-
-* Dropwizard - Bla bla bla
-* Maven - Maybe
-* Atom - ergaerga
-* Love
 
 ## Versioning
 
