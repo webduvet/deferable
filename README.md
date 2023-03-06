@@ -65,7 +65,7 @@ $ npm install deferable
 
 Factory Flavor: **Defer**
 
-This is a simple factory method
+This is a simple factory method returning a holder object for promise and the 
 
 Inside your project:
 
