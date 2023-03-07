@@ -9,12 +9,13 @@ import {
 } from '../src/utils.js'
 
 import {
-	assert 
+	assert,
 } from 'chai'
 
 import {
 	spy
-} from 'chai-spy'
+} from 'sinon'
+
 
 describe('deferable', function() {
     describe('Defer - factory method', function() {
@@ -48,18 +49,25 @@ describe('deferable', function() {
 
 		it('should invoke onTrigger callbacks', function() {
 			let triggered = false;
+			let mocked = spy()
             const executorFn = () => new Promise(
                 (res) => {
                     setTimeout(function(){res('resolved')}, 100)
                 })
             const deferred = Defer(executorFn);
 
+			// test plain call
 			deferred.onTrigger(function() {
 				triggered = true
 			})
 
+			// test spy
+			deferred.onTrigger(mocked)
+
             deferred.trigger();
+
 			assert.isTrue(triggered)
+			assert.isTrue(mocked.calledOnce)
 
             return deferred.promise
                 .then(value => {
