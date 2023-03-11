@@ -9,7 +9,7 @@
   },
   "keywords": [
     "promise",
-	"deferred",
+    "deferred",
     "defer",
     "throttle"
   ],
@@ -25,6 +25,8 @@
     "mocha": "^10.2.0"
   },
   "dependencies": {
-    "@babel/runtime": "^7.21.0"
+    "@babel/runtime": "^7.21.0",
+    "chai-spies": "^1.0.0",
+    "sinon": "^15.0.1"
   }
 }

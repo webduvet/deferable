@@ -59,28 +59,30 @@ export class DeferredTrigger extends DeferredPromise {
 
 /**
  * @desc
- * defer the execution of the workload
+ * factory method returning a deferred object containing a promise and the lever to trigger
+ * to settle the promise.
  *
  * @param {Function} factory function returning a Promise (which needs to be deffered)
  *
  * @returns {Objcect} with deferred promise and an executor which triggers the promise fullfillment
  **/
 export function Defer(workload) {
-	let _reject, _resolve, _called;
+	let _reject, _resolve, _onTrigger = [];
 	const _p = new Promise(function (resolve, reject) {
 		_resolve = resolve;
 		_reject = reject;
 	}.bind(Defer))
 
-	const executor = (function (workload) {
-		let _executor = undefined;
+	const _executor = (function (workload) {
+		let _executorCache = undefined;
 
-		return function() {
-			_called = true;
-			if (_executor) {
-				return _executor;
+		return function(...args) {
+			if (_executorCache) {
+				return _executorCache;
 			}
-			return _executor = workload()
+			// emit onTrigger only first time the workload is executed
+			_onTrigger.forEach((fn) => { fn() })
+			return _executorCache = workload(...args)
 				.then(data => {
 					_resolve(data)
 				})
@@ -93,12 +95,16 @@ export function Defer(workload) {
 	return {
 		get promise() { return _p },
 
-		get called() {
-			return _called ? true : false;
+		onTrigger(callback) {
+			if (typeof callback === 'function') {
+				_onTrigger.push(callback)
+			} else {
+				throw Error('Callback must be type of function.')
+			}
 		},
 
-	    trigger(callback=function() {}) {
-			executor().finally(callback)
+		trigger(...args) {
+			return _executor(...args)
 		}
 	}
 }

@@ -9,27 +9,24 @@ import {
 } from '../src/utils.js'
 
 import {
-	assert 
+	assert,
 } from 'chai'
 
+import {
+	spy
+} from 'sinon'
+
+
 describe('deferable', function() {
-    describe('Defer', function() {
+    describe('Defer - factory method', function() {
         it('Should return object containing promise and trigger function', function() {
             const p = Defer(() => fakeCall());
 
             assert.equal(typeof p, 'object');
             assert.property(p, 'promise');
-            assert.property(p, 'called');
+			assert.property(p, 'onTrigger');
             assert.property(p, 'trigger');
         });
-
-        it('calling trigger should set called flag to true', function() {
-            const deferred = Defer(() => new Promise((res) => { res('resolved') }));
-
-            assert.isFalse(deferred.called);
-            deferred.trigger();
-            assert.isTrue(deferred.called);
-        })
 
         it('should start promise resolution when called trigger()', function(done) {
             const executorFn = () => new Promise(
@@ -37,8 +34,6 @@ describe('deferable', function() {
                     setTimeout(function(){res('resolved')}, 0)
                 })
             const deferred = Defer(executorFn);
-
-            assert.isFalse(deferred.called);
 
             deferred.trigger();
 
@@ -50,8 +45,35 @@ describe('deferable', function() {
                 .catch(() => {
                     assert.fail()
                 })
+        });
 
-        })
+		it('should invoke onTrigger callbacks', function() {
+			let triggered = false;
+			let mocked = spy()
+            const executorFn = () => new Promise(
+                (res) => {
+                    setTimeout(function(){res('resolved')}, 100)
+                })
+            const deferred = Defer(executorFn);
+
+			// test plain call
+			deferred.onTrigger(function() {
+				triggered = true
+			})
+
+			// test spy
+			deferred.onTrigger(mocked)
+
+            deferred.trigger();
+
+			assert.isTrue(triggered)
+			assert.isTrue(mocked.calledOnce)
+
+            return deferred.promise
+                .then(value => {
+					assert.isTrue(triggered)
+                })
+		})
     });
 
     describe('Deferred Promise', function() {
@@ -88,7 +110,7 @@ describe('deferable', function() {
         })
     })
 
-    describe('DeferredTrigger', function() {
+    describe('Deferred Promise with trigger', function() {
         it('DeferredTrigger is Promise', function() {
             const executorFn = () => new Promise(
                 (res) => {
@@ -99,7 +121,7 @@ describe('deferable', function() {
             assert.instanceOf(_p, Promise)
         });
 
-		it('DeferredTrigger can be triggered via trigger method', function(done) {
+		it('trigger method will trigger Promise settling', function(done) {
             const executorFn = () => new Promise(
                 (res) => {
                     setTimeout(function(){res('resolved')}, 0)
