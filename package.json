@@ -3,9 +3,10 @@
   "version": "0.0.1",
   "description": "for creating deferred Promise and actionable promise",
   "main": "index.js",
+  "types": "types/module.d.ts",
   "scripts": {
     "test": "npm run build && mocha --require @babel/register ./lib/**/*.test.js",
-    "build": "babel src -d lib --source-maps"
+    "build": "rm -rf ./lib && babel src -d lib --source-maps"
   },
   "keywords": [
     "promise",

@@ -93,8 +93,24 @@ export function Defer(workload) {
 	})(workload)
 
 	return {
+		/**
+		 * @desc
+		 * getter form wrapped promise
+		 *
+		 * @property {Promise}
+		 */
 		get promise() { return _p },
 
+		/**
+		 * @desc
+		 * hook to notify subscribes that the promise fullfilment had been triggered
+		 * without this we only know when the promise gets settled by subscribing to
+		 * then or catch or finally
+		 *
+		 * @param {Function} callback function without parameters
+		 *
+		 * @returns { undefined }
+		 */
 		onTrigger(callback) {
 			if (typeof callback === 'function') {
 				_onTrigger.push(callback)
@@ -103,6 +119,14 @@ export function Defer(workload) {
 			}
 		},
 
+		/**
+		 * @desc
+		 * triggers the fullfilment of the Promise
+		 * after calling this lever the Promise gets setteld
+		 *
+		 * @param {...any} any number of parameters passed to executor function
+		 * @returns {Promise} returns the Promise which is returned from the executor function
+		 */
 		trigger(...args) {
 			return _executor(...args)
 		}
