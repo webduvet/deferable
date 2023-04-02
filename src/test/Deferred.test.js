@@ -6,7 +6,7 @@ import {
 
 import {
     fakeCall
-} from '../code/utils.js'
+} from '../helpers/utils.js'
 
 import {
 	assert,
