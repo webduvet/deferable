@@ -1,6 +1,6 @@
 {
 	"name": "deferable",
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"description": "for creating deferred Promise and actionable promise",
 	"types": "types/module.d.ts",
 	"main": "./dist/Deferable.js",
