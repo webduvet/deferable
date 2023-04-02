@@ -14,7 +14,7 @@ export type Deferred<T> = {
     promise: Promise<T>;
     onTrigger: (fn: Function) => any;
     trigger: (...p: any) => Promise<T>
-}
+};
 
 /**
  * type Defer factory
@@ -24,4 +24,16 @@ export type Deferred<T> = {
  * @param {Function} factory function returning the promise of interest
  * @return {Object<Deferred>} Object wrapper for Promise and the levers
  */
-export function Defer<T>(fn: Promise<T>): Deferred<T>
+export function Defer<T>(fn: Promise<T>): Deferred<T>;
+
+
+/**
+ * type Deferred Promise
+ *
+ * extends Promise with resolve and reject methods
+ *
+ */
+export type DeferredPromise<T> = Promise<T> & {
+    resolve: (value: T) => void;
+    reject: (reason: any) => void;
+};

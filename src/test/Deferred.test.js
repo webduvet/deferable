@@ -2,7 +2,7 @@ import {
     Defer,
     DeferredPromise,
     DeferredTrigger,
-} from '../code/Deferred.js'
+} from '../code/Deferable.js'
 
 import {
     fakeCall

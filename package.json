@@ -5,12 +5,11 @@
 	"types": "types/module.d.ts",
 	"main": "./dist/Deferable.js",
 	"files": [
-		"dist",
-		"src/types"
+		"dist"
 	],
 	"scripts": {
 		"test": "npm run build && mocha --require @babel/register ./src/**/*.test.js",
-		"build": "rm -rf ./dist && babel src/code -d dist --source-maps"
+		"build": "rm -rf ./dist && babel src/code -d dist --source-maps && cp -r src/types ./dist"
 	},
 	"keywords": [
 		"promise",
