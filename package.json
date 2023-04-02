@@ -2,11 +2,11 @@
   "name": "deferable",
   "version": "0.0.2",
   "description": "for creating deferred Promise and actionable promise",
-  "main": "index.js",
   "types": "types/module.d.ts",
+  "main": "./dist/Deferable.js",
   "scripts": {
-    "test": "npm run build && mocha --require @babel/register ./lib/**/*.test.js",
-    "build": "rm -rf ./lib && babel src -d lib --source-maps"
+    "test": "npm run build && mocha --require @babel/register ./src/**/*.test.js",
+    "build": "rm -rf ./dist && babel src/code -d dist --source-maps"
   },
   "keywords": [
     "promise",
@@ -23,11 +23,9 @@
     "@babel/preset-env": "^7.20.2",
     "@babel/register": "^7.21.0",
     "chai": "^4.3.7",
-    "mocha": "^10.2.0"
-  },
-  "dependencies": {
-    "@babel/runtime": "^7.21.0",
+    "mocha": "^10.2.0",
     "chai-spies": "^1.0.0",
-    "sinon": "^15.0.1"
+    "sinon": "^15.0.1",
+    "@babel/runtime": "^7.21.0"
   }
 }
