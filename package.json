@@ -17,6 +17,10 @@
 		"defer",
 		"throttle"
 	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/webduvet/deferable.git"
+	},
 	"author": "Andrej Bartko",
 	"license": "ISC",
 	"devDependencies": {
