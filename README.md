@@ -1,178 +1,115 @@
 # deferable
-wrapper for promises to allow to defer the execution
 
+[![npm](https://img.shields.io/npm/v/deferable.svg)](https://www.npmjs.com/package/deferable)
+[![CI](https://github.com/webduvet/deferable/actions/workflows/ci.yml/badge.svg)](https://github.com/webduvet/deferable/actions/workflows/ci.yml)
+[![Weekly health check](https://github.com/webduvet/deferable/actions/workflows/weekly.yml/badge.svg)](https://github.com/webduvet/deferable/actions/workflows/weekly.yml)
+[![types](https://img.shields.io/npm/types/deferable.svg)](https://www.npmjs.com/package/deferable)
+[![install size](https://packagephobia.com/badge?p=deferable)](https://packagephobia.com/result?p=deferable)
+[![license](https://img.shields.io/npm/l/deferable.svg)](LICENSE)
 
-## 
-[![npm version](https://badge.fury.io/js/angular2-expandable-list.svg)](https://badge.fury.io/js/angular2-expandable-list)
-[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+Deferred promises for JavaScript and TypeScript: hand out a promise **now**,
+decide **later** when (or whether) the work behind it runs.
 
-# Deferable
+- Zero dependencies, tiny, ESM, ships its own TypeScript types
+- `Defer(fn)` - lazy promise with an explicit `trigger()`
+- `DeferredPromise` - a promise you can `resolve()` / `reject()` from outside
+- `DeferredTrigger` - class form of `Defer`
+- Runs the work at most once, turns synchronous throws into rejections
 
-> Wrapper for promises to allow to defer the execution.
+Its sibling [prmsq](https://github.com/webduvet/prmsq) builds a rate-limited promise queue on top of it.
 
-## Prerequisites
-
-None. It only requires Promise capable version javascript interpreter.
-e.g. Node version(0.12 and higher)
-
-```sh
-$ npm -v && node -v
-6.4.1
-v8.16.0
-```
-
-## Table of contents
-
-- [Project Name](#deferable)
-  - [Prerequisites](#prerequisites)
-  - [Table of contents](#table-of-contents)
-  - [Getting Started](#getting-started)
-  - [Installation](#installation)
-  - [Usage](#usage)
-    - [Factory flavor](#factory-flavor)
-    - [Class Flavor](#class-flavor)
-    - [Running the tests](#running-the-tests)
-    - [Building a distribution version](#building-a-distribution-version)
-  - [Contributing](#contributing)
-  - [Credits](#credits)
-  - [Built With](#built-with)
-  - [Versioning](#versioning)
-  - [Authors](#authors)
-  - [License](#license)
-
-## Getting Started
-
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
-
-clone the repository and from inside run the usual
-```sh
-$ npm run test
-$ npm run build
-```
-
-## Installation
-
-**BEFORE YOU INSTALL:** please read the [prerequisites](#prerequisites)
-
-Start with cloning this repo on your local machine:
+## Install
 
 ```sh
-$ cd npm-project
-$ npm install deferable
+npm install deferable
 ```
+
+Requires Node.js 20.19+ (or any modern bundler/browser). The package is ESM;
+`require('deferable')` also works on Node 20.19+ / 22.12+.
 
 ## Usage
 
-Factory Flavor: **Defer**
-
-This is a simple factory method returning a holder object for promise and the 
-
-Inside your project:
+### `Defer(workload)`
 
 ```js
-import {
-    Defer
-} from 'deferable'
+import { Defer } from 'deferable';
 
-const { result, ...lever } = Defer(function() {
-    // returning the actual operation which returns promise e.g.
-    return http.call(url)
-    }, "result")
+const { promise, trigger, onTrigger, called } = Defer((id) => fetch(`/api/items/${id}`));
 
+onTrigger(() => console.log('request started'));
 
-// passing a promise to where is it expected
-consumerService(result)
-...
-// at some point in the code this triggers the promise fulfillment
-lever.trigger()
+consumer(promise); // hand the promise out - nothing has been requested yet
+
+trigger(42);       // arguments are forwarded to the workload
 ```
 
-It returns an object with three keys: `promise, trigger, called`;
+| Member | Description |
+| --- | --- |
+| `promise` | Promise for the workload's result. Stays pending until `trigger()`. |
+| `trigger(...args)` | Starts the workload. Only the first call runs it; later calls return the same promise. Returns a promise that resolves once `promise` has settled and **never rejects** - handle errors through `promise`. |
+| `onTrigger(cb)` | Registers a callback invoked once, right before the workload starts. |
+| `called` | `true` after `trigger()` has been called. |
 
-    - first contains the actual promise which can be consumed.
-    - trigger is a function which triggers the promise fulfillment.
-    - called is a flag
+The workload may return a promise or a plain value. If it throws synchronously,
+`promise` rejects.
 
-
-Class flavor: **Deferred, DeferredTrigger**
-
-In essence the class implementation of the above.
-Objects `Deferred` and `DeferredTrigger` is typeof **Promise** should your project require this feature.
+### `DeferredTrigger`
 
 ```js
-import {
-    DefferedTrigger
-} from 'deferable';
+import { DeferredTrigger } from 'deferable';
 
-const deferred = new Deferred(() => http.call(url))
-
-// passing a promise to where is it expected
-consumerService(deferred.promise)
-
-// at some point in the code this triggers the promise fulfillment
-deferred.trigger()
+const lazy = new DeferredTrigger(() => fetch(url));
+consumer(lazy);  // it *is* a promise
+lazy.trigger();  // starts the fetch (once)
 ```
 
-**Deferred** class is just a plain implementation of the deferred pattern exposing `resolve` and `reject` resolvers.
-
+### `DeferredPromise`
 
 ```js
-import {
-    Deffered
-} from 'deferable';
+import { DeferredPromise } from 'deferable';
 
-const deferred = new Deffered()
+const deferred = new DeferredPromise();
+consumer(deferred);
 
-// passing a promise to where is it expected
-consumerService(deferred)
-
-// at some point in the code this triggers the promise fulfillment
-thanableService().then((data) => {
-    deferred.resolve(data)
-});
+legacyApi.on('data', (data) => deferred.resolve(data));
+legacyApi.on('error', (err) => deferred.reject(err));
 ```
 
-### Running the tests
+`then()` / `catch()` / `finally()` return ordinary `Promise`s.
+
+### TypeScript
+
+Types are included and infer the result type:
+
+```ts
+const d = Defer(async (n: number) => String(n)); // Deferred<string>
+d.trigger(1);
+const s: string = await d.promise;
+```
+
+### Note on unhandled rejections
+
+`promise` is a normal promise: if the workload fails and nobody handles
+`promise`, Node reports an unhandled rejection. Always attach a handler (or use
+`Promise.allSettled`).
+
+## Development
 
 ```sh
-$ npm test
+npm ci
+npm test            # unit + packaging integration tests (node:test)
+npm run test:types  # type definitions
+npm run coverage
+npm run example
 ```
 
-### Building a distribution version
+The packaging integration test runs `npm pack`, installs the tarball into a
+scratch project and imports it via `import` and `require`. CI runs on Node 20,
+22 and 24, and a [weekly workflow](.github/workflows/weekly.yml) re-tests
+against the newest Node and the newest allowed dependencies and audits them.
 
-```sh
-$ npm run build
-```
-
-This task will create a distribution version of the project
-inside your local `dist/` folder
-
-
-## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
-
-1.  Fork it!
-2.  Create your feature branch: `git checkout -b my-new-feature`
-3.  Add your changes: `git add .`
-4.  Commit your changes: `git commit -am 'Add some feature'`
-5.  Push to the branch: `git push origin my-new-feature`
-6.  Submit a pull request :sunglasses:
-
-## Credits
-
-TODO: Write credits
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags).
-
-## Authors
-
-* **Andrej Bartko** - *Initial work* - [AndrejBartko](https://github.com/webduvet)
-
-See also the list of [contributors](https://github.com/webduvet/deferable/contributors) who participated in this project.
+See [CONTRIBUTING.md](CONTRIBUTING.md) and the [CHANGELOG](CHANGELOG.md).
 
 ## License
 
-[MIT License](https://github.com/git/git-scm.com/blob/main/MIT-LICENSE.txt) © 2012-2022 Scott Chacon and others
+[MIT](LICENSE) © Andrej Bartko
