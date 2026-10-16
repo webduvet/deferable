@@ -32,7 +32,7 @@ jobs:
       # Authenticates via npm trusted publishing (OIDC) - no token secret.
       # Configure it on npmjs.com: package Settings -> Trusted publishing ->
       # GitHub Actions, workflow file `publish.yml`.
-      - run: npm publish --provenance --access public
+      - run: npm publish --provenance --access public --loglevel verbose
       - name: Create GitHub release
         if: github.event_name == 'workflow_dispatch'
         run: gh release create "v${{ steps.pkg.outputs.version }}" --target "$GITHUB_SHA" --title "v${{ steps.pkg.outputs.version }}" --notes "See [CHANGELOG.md](CHANGELOG.md)."
