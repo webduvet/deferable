@@ -1,0 +1,27 @@
+name: Weekly health check
+# Catches rot early: runs against the newest Node and the newest allowed
+# dependency versions (ignoring the lockfile), and audits for known advisories.
+on:
+  schedule:
+    - cron: '17 6 * * 1' # Mondays 06:17 UTC
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [lts/*, latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install newest allowed dependencies
+        run: npm install --no-package-lock
+      - run: npm run test:types
+      - run: npm test
+      - name: Audit
+        run: npm audit --audit-level=moderate
