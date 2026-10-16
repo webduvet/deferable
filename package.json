@@ -1,6 +1,6 @@
 {
 	"name": "deferable",
-	"version": "0.0.8",
+	"version": "1.0.0",
 	"description": "Deferred promises and lazy, trigger-on-demand promises for JavaScript and TypeScript. Zero dependencies.",
 	"type": "module",
 	"main": "./src/index.js",
