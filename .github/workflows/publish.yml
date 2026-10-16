@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: write # create the GitHub release on manual runs
-  id-token: write # npm provenance / trusted publishing
+  id-token: write # npm trusted publishing + provenance
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -29,9 +29,10 @@ jobs:
             echo "::error::Version ${{ steps.pkg.outputs.version }} is already published - bump package.json first"
             exit 1
           fi
+      # Authenticates via npm trusted publishing (OIDC) - no token secret.
+      # Configure it on npmjs.com: package Settings -> Trusted publishing ->
+      # GitHub Actions, workflow file `publish.yml`.
       - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Create GitHub release
         if: github.event_name == 'workflow_dispatch'
         run: gh release create "v${{ steps.pkg.outputs.version }}" --target "$GITHUB_SHA" --title "v${{ steps.pkg.outputs.version }}" --notes "See [CHANGELOG.md](CHANGELOG.md)."
