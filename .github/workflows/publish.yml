@@ -29,10 +29,12 @@ jobs:
             echo "::error::Version ${{ steps.pkg.outputs.version }} is already published - bump package.json first"
             exit 1
           fi
-      # Authenticates via npm trusted publishing (OIDC) - no token secret.
-      # Configure it on npmjs.com: package Settings -> Trusted publishing ->
-      # GitHub Actions, workflow file `publish.yml`.
+      # npm tries trusted publishing (OIDC) first - configure it on npmjs.com:
+      # package Settings -> Trusted publishing -> GitHub Actions, workflow
+      # `publish.yml`. Falls back to the NPM_TOKEN secret if that is not set up.
       - run: npm publish --provenance --access public --loglevel verbose
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Create GitHub release
         if: github.event_name == 'workflow_dispatch'
         run: gh release create "v${{ steps.pkg.outputs.version }}" --target "$GITHUB_SHA" --title "v${{ steps.pkg.outputs.version }}" --notes "See [CHANGELOG.md](CHANGELOG.md)."
